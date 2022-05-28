@@ -23,4 +23,10 @@ export default {
         ]);
       }, 1000),
     ),
+  remove: (arr: Item[], id: string): Promise<Item[]> =>
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(arr.filter((item: Item) => item.id !== parseInt(id, 10) ))
+      }, 1000),
+    ),
 };

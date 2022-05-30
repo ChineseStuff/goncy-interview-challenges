@@ -11,6 +11,8 @@ interface Form extends HTMLFormElement {
 
 function App() {
   const [items, setItems] = useState<Item[]>([]);
+  const [newTask, setNewTask] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   function handleToggle(id: Item["id"]) {
     setItems((items) =>
@@ -18,8 +20,22 @@ function App() {
     );
   }
 
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setNewTask(event.target.value);
+  }
+
   function handleAdd(event: React.ChangeEvent<Form>) {
     // Should implement
+    let maxID = Math.max(...items.map((item) => item.id));
+    const newItem: Item = {
+      id: maxID + 1,
+      text: newTask,
+      completed: false,
+    };
+
+    setItems((items) => [...items, newItem]);
+    setNewTask("");
+    event.preventDefault();
   }
 
   function handleRemove(id: Item["id"]) {
@@ -27,14 +43,19 @@ function App() {
   }
 
   useEffect(() => {
-    api.list().then(setItems);
+    api.list().then((listItems) => {
+      setItems(listItems);
+      setIsLoading(false);
+    });
   }, []);
+
+  if (isLoading) return "Loading...";
 
   return (
     <main className={styles.main}>
       <h1>Supermarket list</h1>
       <form onSubmit={handleAdd}>
-        <input name="text" type="text" />
+        <input name="text" type="text" value={newTask} onChange={handleInputChange}/>
         <button>Add</button>
       </form>
       <ul>
